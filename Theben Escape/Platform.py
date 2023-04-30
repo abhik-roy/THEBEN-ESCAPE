@@ -5,7 +5,8 @@ from settings import OBSTACLE_WIDTH
 class Obstacle(pygame.sprite.Sprite):
     def __init__(self, x, y, is_stalactite):
         super().__init__()
-        image_file = 'stalactite.png' if is_stalactite else 'stalagmite.png'
+        self.scored = False
+        image_file = 'arrow.png' if is_stalactite else 'arrow.png'
         original_image = pygame.image.load(image_file).convert_alpha()
         width, height = original_image.get_size()
         height = int(height * (OBSTACLE_WIDTH / width))
@@ -15,6 +16,6 @@ class Obstacle(pygame.sprite.Sprite):
         self.rect.x, self.rect.y = x, y
 
     def update(self):
-        self.rect.x -= 10
+        self.rect.x -= 20
         if self.rect.x + self.rect.width < 0:
             self.kill()
