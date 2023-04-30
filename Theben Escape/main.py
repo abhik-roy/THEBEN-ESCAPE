@@ -11,7 +11,7 @@ pygame.mixer.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Flappy Bird")
 clock = pygame.time.Clock()
-original_bg_image = pygame.image.load('background2.png').convert()
+original_bg_image = pygame.image.load('loading_screen.png').convert()
 BACKGROUND_IMG = pygame.transform.scale(original_bg_image, (WIDTH, HEIGHT))
 
 
@@ -26,7 +26,7 @@ def generate_obstacles(x, shooting_offset=100):
 
 def draw_text(surface, text, size, x, y, font_name):
     font = pygame.font.Font(font_name, size)
-    text_surface = font.render(text, True, (255, 255, 0))
+    text_surface = font.render(text, True, (0, 0, 0))
     text_rect = text_surface.get_rect()
     text_rect.midtop = (x, y)
     surface.blit(text_surface, text_rect)
@@ -42,7 +42,7 @@ def draw_score(screen, text, x, y, font_name, size=24, text_color=(255, 0, 0)):
 
 def game_over_screen(screen, score):
     font = pygame.font.Font('doomfont.ttf', 64)
-    text = font.render("GAME OVER", True, (255, 0, 0))
+    text = font.render("GAME OVER", True, (0, 0, 0))
     text_rect = text.get_rect(center=(WIDTH/2, HEIGHT/2 - 50))
     screen.blit(text, text_rect)
 
@@ -84,7 +84,7 @@ def middle_collision(player, obstacles):
     return False, False
 
 
-def main():
+def main(selected_background, selected_music):
     player = Player()
     all_sprites = pygame.sprite.Group(player)
     obstacles = pygame.sprite.Group()
@@ -94,8 +94,9 @@ def main():
     speech_bubble_timer = 0
     obstacle_timer = 0
     game_started = False
-
-    pygame.mixer.music.load('puppetz.mp3')
+    original_bg_image = pygame.image.load(selected_background).convert()
+    BACKGROUND_IMG = pygame.transform.scale(original_bg_image, (WIDTH, HEIGHT))
+    pygame.mixer.music.load(selected_music)
     pygame.mixer.music.play(-1)
     score = 0
     running = True
@@ -156,15 +157,15 @@ def main():
                 score += 5
 
         screen.blit(BACKGROUND_IMG, (0, 0))
-        draw_text(screen, 'THEBEN ESCAPE', 80, WIDTH // 2, 20, 'doomfont.ttf')
+        draw_text(screen, 'THEBEN ESCAPE', 100, WIDTH // 2, 20, 'Papyrus.ttf')
         all_sprites.draw(screen)
         draw_score(screen, f"Score: {score}",
-                   WIDTH - 20, 20, 'doomfont.ttf', size=24)
+                   WIDTH - 20, 20, 'Papyrus.ttf', size=24)
 
         pygame.display.flip()
 
     pygame.quit()
 
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#    main()
