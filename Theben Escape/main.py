@@ -5,12 +5,13 @@ from Platform import Obstacle
 from settings import WIDTH, HEIGHT, FPS, GAP_SIZE, OBSTACLE_SPACING
 
 pygame.init()
-pygame.mixer.init()  # Initialize the mixer for background music
+pygame.mixer.init()
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Flappy Bird")
+pygame.display.set_caption("Theben Escape")
 clock = pygame.time.Clock()
-original_bg_image = pygame.image.load('background.png').convert()
+original_bg_image = pygame.image.load('background2.png').convert()
+
 BACKGROUND_IMG = pygame.transform.scale(original_bg_image, (WIDTH, HEIGHT))
 
 
@@ -23,7 +24,7 @@ def generate_obstacles(x):
 
 def draw_text(surface, text, size, x, y, font_name):
     font = pygame.font.Font(font_name, size)
-    text_surface = font.render(text, True, (200, 0, 0))
+    text_surface = font.render(text, True, (0, 0, 0))
     text_rect = text_surface.get_rect()
     text_rect.midtop = (x, y)
     surface.blit(text_surface, text_rect)
@@ -37,8 +38,9 @@ def main():
     obstacle_timer = 0
     game_started = False
 
-    # Load and play background music
     pygame.mixer.music.load('background_music.mp3')
+    pygame.mixer.music.set_volume(0.5)  # Set the volume to 50%
+
     pygame.mixer.music.play(-1)
 
     running = True
@@ -52,6 +54,13 @@ def main():
                     if not game_started:
                         game_started = True
                     player.jump()
+                elif event.key == pygame.K_LEFT:
+                    player.move_left()
+                elif event.key == pygame.K_RIGHT:
+                    player.move_right()
+            elif event.type == pygame.KEYUP:
+                if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
+                    player.stop_movement()
 
         if game_started:
             if obstacle_timer == 0:
@@ -69,7 +78,7 @@ def main():
                 running = False
 
         screen.blit(BACKGROUND_IMG, (0, 0))
-        draw_text(screen, 'THEBEN ESCAPE', 64, WIDTH // 2, 20, 'DOOMFONT.ttf')
+        draw_text(screen, 'THEBEN ESCAPE', 64, WIDTH // 2, 20, 'doomfont.ttf')
         all_sprites.draw(screen)
         pygame.display.flip()
 

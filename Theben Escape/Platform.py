@@ -15,6 +15,6 @@ class Obstacle(pygame.sprite.Sprite):
         self.rect.x, self.rect.y = x, y
 
     def update(self):
-        self.rect.x -= 5
+        self.rect.x -= 10
         if self.rect.x + self.rect.width < 0:
             self.kill()
