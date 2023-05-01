@@ -11,6 +11,7 @@ class Player(pygame.sprite.Sprite):
         self.original_image = pygame.transform.scale(
             original_image, (width, height))
         self.image = self.original_image.copy()
+        self.jump_counter = 0
         self.rect = self.image.get_rect()
         self.rect.x, self.rect.y = 100, 300
         self.vel_y = 0
@@ -27,7 +28,8 @@ class Player(pygame.sprite.Sprite):
 
         # Clamp the player's vertical position within the screen height
         self.rect.y = max(0, min(HEIGHT - self.rect.height, self.rect.y))
-
+        if self.rect.y == HEIGHT - self.rect.height:
+            self.jump_counter = 0
         if self.spinning:
             self.spin_angle -= 15
             if self.spin_angle <= -360:
@@ -55,7 +57,9 @@ class Player(pygame.sprite.Sprite):
                 self.attacking = False
 
     def jump(self):
-        self.vel_y = -15
+        if self.jump_counter < 3:
+            self.vel_y = -15
+            self.jump_counter += 1
 
     def attack(self):
         self.attacking = True

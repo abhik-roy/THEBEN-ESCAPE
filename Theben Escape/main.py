@@ -114,7 +114,7 @@ def main(selected_background, selected_music):
                     player.move_left()
                 elif event.key == pygame.K_RIGHT:
                     player.move_right()
-                if event.key == pygame.K_RETURN:
+                if event.key == pygame.K_DOWN:
                     player.attack()
             elif event.type == pygame.KEYUP:
                 if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
