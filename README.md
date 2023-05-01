@@ -1,2 +1,2 @@
 # THEBEN-ESCAPE
-base game
+https://abhik-roy.github.io/morgoth-games/
