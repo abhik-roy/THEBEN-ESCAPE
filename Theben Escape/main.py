@@ -2,6 +2,7 @@ import pygame
 import random
 from player import Player
 from Platform import Obstacle
+from background import Background
 from npc import NPC
 from settings import WIDTH, HEIGHT, FPS, GAP_SIZE, OBSTACLE_SPACING
 
@@ -85,8 +86,11 @@ def middle_collision(player, obstacles):
 
 
 def main(selected_background, selected_music):
+    background1 = Background(selected_background, 4)
+    background2 = Background(selected_background, 4)
+    background2.rect.x = background1.rect.width
     player = Player()
-    all_sprites = pygame.sprite.Group(player)
+    all_sprites = pygame.sprite.Group(background1, background2, player)
     obstacles = pygame.sprite.Group()
 
     npc = NPC()
@@ -122,7 +126,8 @@ def main(selected_background, selected_music):
 
         keys_pressed = pygame.key.get_pressed()
         player.update(keys_pressed)
-
+        background1.update()
+        background2.update()
         if game_started:
             speech_bubble_timer += 1
             if speech_bubble_timer % (5) == 0:
