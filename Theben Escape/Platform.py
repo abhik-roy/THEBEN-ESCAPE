@@ -1,5 +1,5 @@
 import pygame
-from settings import OBSTACLE_WIDTH
+from settings import OBSTACLE_WIDTH, OBSTACLE_SPEED
 
 
 class Obstacle(pygame.sprite.Sprite):
@@ -15,7 +15,7 @@ class Obstacle(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x, self.rect.y = x, y
 
-    def update(self):
-        self.rect.x -= 20
+    def update(self, speed):
+        self.rect.x -= speed
         if self.rect.x + self.rect.width < 0:
             self.kill()

@@ -3,9 +3,9 @@ from settings import BIRD_SCALE, HEIGHT
 
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, player):
         super().__init__()
-        original_image = pygame.image.load('player.png').convert_alpha()
+        original_image = pygame.image.load(player).convert_alpha()
         width, height = original_image.get_size()
         width, height = int(width * BIRD_SCALE), int(height * BIRD_SCALE)
         self.original_image = pygame.transform.scale(

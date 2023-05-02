@@ -4,7 +4,8 @@ from player import Player
 from Platform import Obstacle
 from background import Background
 from npc import NPC
-from settings import WIDTH, HEIGHT, FPS, GAP_SIZE, OBSTACLE_SPACING
+from settings import WIDTH, HEIGHT
+from settings import generate_speed, generate_FPS, generate_Gs, generate_Ob
 
 pygame.init()
 pygame.mixer.init()
@@ -16,10 +17,10 @@ original_bg_image = pygame.image.load('loading_screen.png').convert()
 BACKGROUND_IMG = pygame.transform.scale(original_bg_image, (WIDTH, HEIGHT))
 
 
-def generate_obstacles(x, shooting_offset=100):
-    gap_start = random.randint(100, HEIGHT - GAP_SIZE - 100)
+def generate_obstacles(x, shooting_offset=100, gap=1):
+    gap_start = random.randint(100, HEIGHT - gap - 100)
     obstacle_top = Obstacle(x, gap_start - HEIGHT, True)
-    obstacle_bottom = Obstacle(x, gap_start + GAP_SIZE, False)
+    obstacle_bottom = Obstacle(x, gap_start + gap, False)
     obstacle_top.rect.x += shooting_offset
     obstacle_bottom.rect.x += shooting_offset
     return (obstacle_top, obstacle_bottom), gap_start
@@ -85,11 +86,14 @@ def middle_collision(player, obstacles):
     return False, False
 
 
-def main(selected_background, selected_music):
+def main(selected_background, selected_music, selected_player, difficulty):
+    FPS = generate_FPS(difficulty)
+    GAP_SIZE = generate_Gs(difficulty)
+    OBSTACLE_SPACING = generate_Ob(difficulty)
     background1 = Background(selected_background, 4)
     background2 = Background(selected_background, 4)
     background2.rect.x = background1.rect.width
-    player = Player()
+    player = Player(selected_player)
     all_sprites = pygame.sprite.Group(background1, background2, player)
     obstacles = pygame.sprite.Group()
 
@@ -136,7 +140,7 @@ def main(selected_background, selected_music):
 
         if game_started:
             if obstacle_timer == 0:
-                new_obstacles, gap_start = generate_obstacles(WIDTH)
+                new_obstacles, gap_start = generate_obstacles(WIDTH, GAP_SIZE)
                 obstacles.add(*new_obstacles)
                 all_sprites.add(*new_obstacles)
                 npc.move_to(gap_start)
@@ -144,7 +148,7 @@ def main(selected_background, selected_music):
             else:
                 obstacle_timer -= 1
 
-            obstacles.update()
+            obstacles.update(generate_speed(difficulty))
             for obstacle in obstacles:
                 if obstacle.rect.right < player.rect.centerx and not obstacle.scored:
                     score += 1
@@ -162,8 +166,9 @@ def main(selected_background, selected_music):
                 score += 5
 
         screen.blit(BACKGROUND_IMG, (0, 0))
-        draw_text(screen, 'THEBEN ESCAPE', 100, WIDTH // 2, 20, 'Papyrus.ttf')
         all_sprites.draw(screen)
+        draw_text(screen, 'THEBEN QUEST', 100, WIDTH // 2, 20, 'Papyrus.ttf')
+
         draw_score(screen, f"Score: {score}",
                    WIDTH - 20, 20, 'Papyrus.ttf', size=24)
 
