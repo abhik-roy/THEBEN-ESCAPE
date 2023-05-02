@@ -5,6 +5,9 @@ from settings import BIRD_SCALE, HEIGHT
 class Player(pygame.sprite.Sprite):
     def __init__(self, player):
         super().__init__()
+        # self.attack_timer = 0
+        self.last_attack_time = 0
+        self.attack_cooldown = 500
         original_image = pygame.image.load(player).convert_alpha()
         width, height = original_image.get_size()
         width, height = int(width * BIRD_SCALE), int(height * BIRD_SCALE)
@@ -62,9 +65,13 @@ class Player(pygame.sprite.Sprite):
             self.jump_counter += 1
 
     def attack(self):
-        self.attacking = True
-        self.spinning = True
-        self.spin_angle = 0
+        current_time = pygame.time.get_ticks()
+
+        if current_time - self.last_attack_time >= self.attack_cooldown:
+            self.attacking = True
+            self.spinning = True
+            self.spin_angle = 0
+            self.last_attack_time = current_time
 
     def move_left(self):
         self.vel_x = -10

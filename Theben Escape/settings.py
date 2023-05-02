@@ -24,7 +24,7 @@ def generate_Gs(setting):
     elif setting == 1:
         return 125
     elif setting == 2:
-        return 95
+        return 70
     else:
         return 70
 
@@ -35,7 +35,7 @@ def generate_Ob(setting):
     elif setting == 1:
         return 175
     elif setting == 2:
-        return 125
+        return 75
     else:
         return 50
 
@@ -46,6 +46,6 @@ def generate_speed(setting):
     elif setting == 1:
         return 22
     elif setting == 2:
-        return 27
+        return 37
     else:
-        return 45
+        return 50

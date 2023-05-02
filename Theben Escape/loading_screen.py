@@ -94,7 +94,7 @@ selected_music = None
 selected_player = None
 selected_difficulty = None
 title_font = pygame.font.Font('Papyrus.ttf', 60)
-sub_font = pygame.font.Font('Papyrus.ttf', 40)
+sub_font = pygame.font.Font('Papyrus.ttf', 50)
 
 running = True
 while running:
@@ -119,7 +119,8 @@ while running:
     screen.blit(subtitle_text, subtitle_rect)
 
 # Draw choose difficulty text
-    difficulty_text = font.render("Choose a difficulty", True, (0, 10, 10))
+    d_font = pygame.font.Font('Papyrus.ttf', 34)
+    difficulty_text = d_font.render("Choose a difficulty", True, (10, 20, 10))
     difficulty_text_rect = difficulty_text.get_rect(center=(900, 160))
     screen.blit(difficulty_text, difficulty_text_rect)
 
