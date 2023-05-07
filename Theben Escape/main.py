@@ -1,6 +1,7 @@
 import pygame
 import random
 from player import Player
+from boss import Boss
 from Platform import Obstacle
 from background import Background
 from npc import NPC
@@ -15,7 +16,7 @@ pygame.display.set_caption("Flappy Bird")
 clock = pygame.time.Clock()
 original_bg_image = pygame.image.load('loading_screen.png').convert()
 BACKGROUND_IMG = pygame.transform.scale(original_bg_image, (WIDTH, HEIGHT))
-
+is_bossfight = True
 
 def generate_obstacles(x, shooting_offset=100, gap=1):
     gap_start = random.randint(100, HEIGHT - gap - 100)
@@ -58,21 +59,6 @@ def end_game(screen, score):
     game_over_screen(screen, score)
 
 
-def draw_speech_bubble(screen, text, x, y, font_name, size=100, padding=10, bubble_color=(255, 255, 255), text_color=(0, 0, 0)):
-    font = pygame.font.Font(font_name, size)
-    text_surface = font.render(text, True, text_color)
-    text_rect = text_surface.get_rect()
-    text_rect.topleft = (x + padding, y + padding)
-
-    bubble_rect = text_surface.get_rect()
-    bubble_rect.inflate_ip(padding * 2, padding * 2)
-    bubble_rect.topleft = (x, y)
-
-    pygame.draw.rect(screen, bubble_color, bubble_rect)
-    pygame.draw.rect(screen, text_color, bubble_rect, 2)
-    screen.blit(text_surface, text_rect)
-
-
 def middle_collision(player, obstacles):
     middle_offset = player.rect.height // 2
     player_middle_rect = player.rect.inflate(0, -middle_offset)
@@ -94,6 +80,9 @@ def main(selected_background, selected_music, selected_player, difficulty):
     background2 = Background(selected_background, 4)
     background2.rect.x = background1.rect.width
     player = Player(selected_player)
+    boss = Boss()
+    boss.rect.x = WIDTH // 2 - boss.rect.width // 2
+    boss.rect.y = HEIGHT // 2 - boss.rect.height // 2
     all_sprites = pygame.sprite.Group(background1, background2, player)
     obstacles = pygame.sprite.Group()
 
@@ -132,13 +121,8 @@ def main(selected_background, selected_music, selected_player, difficulty):
         player.update(keys_pressed)
         background1.update()
         background2.update()
-        if game_started:
-            speech_bubble_timer += 1
-            if speech_bubble_timer % (5) == 0:
-                draw_speech_bubble(
-                    screen, "Watch out!", npc.rect.x - 150, npc.rect.y - 50, 'doomfont.ttf', size=200)
-
-        if game_started:
+        
+        if game_started and not is_bossfight:
             if obstacle_timer == 0:
                 new_obstacles, gap_start = generate_obstacles(WIDTH, GAP_SIZE)
                 obstacles.add(*new_obstacles)
@@ -155,7 +139,7 @@ def main(selected_background, selected_music, selected_player, difficulty):
                     obstacle.scored = True
 
             player.update(keys_pressed)
-
+            
             collided, attacking_collision = middle_collision(player, obstacles)
             if collided:
                 end_game(screen, score)
@@ -164,9 +148,11 @@ def main(selected_background, selected_music, selected_player, difficulty):
 
             elif attacking_collision:
                 score += 5
-
+        boss.update(player)
         screen.blit(BACKGROUND_IMG, (0, 0))
+        
         all_sprites.draw(screen)
+        screen.blit(boss.image, boss.rect)
         draw_text(screen, 'THEBEN QUEST', 100, WIDTH // 2, 20, 'Papyrus.ttf')
 
         draw_score(screen, f"Score: {score}",
