@@ -2,28 +2,36 @@ import pygame
 import random
 from player import Player
 from Platform import Obstacle
+from platform_block import PlatformBlock
 from background import Background
 from npc import NPC
 from settings import WIDTH, HEIGHT
-from settings import generate_speed, generate_FPS, generate_Gs, generate_Ob
+from settings import generate_speed, generate_FPS, generate_Ob
 
 pygame.init()
 pygame.mixer.init()
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Flappy Bird")
+pygame.display.set_caption("Theben Platformer")
 clock = pygame.time.Clock()
 original_bg_image = pygame.image.load('loading_screen.png').convert()
 BACKGROUND_IMG = pygame.transform.scale(original_bg_image, (WIDTH, HEIGHT))
 
 
-def generate_obstacles(x, shooting_offset=100, gap=1):
-    gap_start = random.randint(100, HEIGHT - gap - 100)
-    obstacle_top = Obstacle(x, gap_start - HEIGHT, True)
-    obstacle_bottom = Obstacle(x, gap_start + gap, False)
-    obstacle_top.rect.x += shooting_offset
-    obstacle_bottom.rect.x += shooting_offset
-    return (obstacle_top, obstacle_bottom), gap_start
+def generate_obstacles(x):
+    y = random.randint(100, HEIGHT - 100)
+    obstacle = Obstacle(x, y, False)
+    return obstacle
+
+
+def generate_platforms():
+    positions = [
+        (0, HEIGHT - 40),
+        (300, HEIGHT - 200),
+        (650, HEIGHT - 350),
+        (1000, HEIGHT - 500),
+    ]
+    return [PlatformBlock(x, y) for x, y in positions]
 
 
 def draw_text(surface, text, size, x, y, font_name):
@@ -88,13 +96,11 @@ def middle_collision(player, obstacles):
 
 def main(selected_background, selected_music, selected_player, difficulty):
     FPS = generate_FPS(difficulty)
-    GAP_SIZE = generate_Gs(difficulty)
     OBSTACLE_SPACING = generate_Ob(difficulty)
-    background1 = Background(selected_background, 4)
-    background2 = Background(selected_background, 4)
-    background2.rect.x = background1.rect.width
+    background1 = Background(selected_background, 0)
     player = Player(selected_player)
-    all_sprites = pygame.sprite.Group(background1, background2, player)
+    platforms = pygame.sprite.Group(*generate_platforms())
+    all_sprites = pygame.sprite.Group(background1, player, *platforms)
     obstacles = pygame.sprite.Group()
 
     npc = NPC()
@@ -129,9 +135,8 @@ def main(selected_background, selected_music, selected_player, difficulty):
                     player.vel_x = 0
 
         keys_pressed = pygame.key.get_pressed()
-        player.update(keys_pressed)
+        player.update(keys_pressed, platforms)
         background1.update()
-        background2.update()
         if game_started:
             speech_bubble_timer += 1
             if speech_bubble_timer % (5) == 0:
@@ -140,10 +145,9 @@ def main(selected_background, selected_music, selected_player, difficulty):
 
         if game_started:
             if obstacle_timer == 0:
-                new_obstacles, gap_start = generate_obstacles(WIDTH, GAP_SIZE)
-                obstacles.add(*new_obstacles)
-                all_sprites.add(*new_obstacles)
-                npc.move_to(gap_start)
+                new_obstacle = generate_obstacles(WIDTH)
+                obstacles.add(new_obstacle)
+                all_sprites.add(new_obstacle)
                 obstacle_timer = OBSTACLE_SPACING
             else:
                 obstacle_timer -= 1
@@ -154,7 +158,7 @@ def main(selected_background, selected_music, selected_player, difficulty):
                     score += 1
                     obstacle.scored = True
 
-            player.update(keys_pressed)
+            player.update(keys_pressed, platforms)
 
             collided, attacking_collision = middle_collision(player, obstacles)
             if collided:

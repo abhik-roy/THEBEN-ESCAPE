@@ -24,14 +24,24 @@ class Player(pygame.sprite.Sprite):
         self.spinning = False
         self.spin_angle = 0
 
-    def update(self, keys_pressed):
+    def update(self, keys_pressed, platforms=None):
         # gravity
         self.vel_y += 0.5
         self.rect.y += self.vel_y
 
-        # Clamp the player's vertical position within the screen height
-        self.rect.y = max(0, min(HEIGHT - self.rect.height, self.rect.y))
-        if self.rect.y == HEIGHT - self.rect.height:
+        # Collision with platforms
+        if platforms:
+            collided = pygame.sprite.spritecollide(self, platforms, False)
+            for plat in collided:
+                if self.vel_y >= 0 and self.rect.bottom <= plat.rect.bottom:
+                    self.rect.bottom = plat.rect.top
+                    self.vel_y = 0
+                    self.jump_counter = 0
+
+        # Clamp to the floor
+        if self.rect.bottom >= HEIGHT:
+            self.rect.bottom = HEIGHT
+            self.vel_y = 0
             self.jump_counter = 0
         if self.spinning:
             self.spin_angle -= 15
